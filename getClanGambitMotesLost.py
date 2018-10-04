@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
 import requests
-import pprint
 import datetime
 
-from APIKEY import APIKEY
-HEADERS = APIKEY
+#Formatting if needing to view json in an easier to read output
+import pprint
 pp = pprint.PrettyPrinter(indent=2)
+
+#Read in API key from separate file. Keep it secret.
+from bungie_apikey import APIKEY
+HEADERS = APIKEY
 
 groupType='1'
 groupName='BreakfastClubGaming'
 groupId='1669746'
 membershipType='1'
-displayName='DigiCub'
 bungie_url='https://www.bungie.net/Platform'
 clanIds = {}
 cid = []
@@ -26,50 +28,50 @@ def className(classId):
         classType = 'Warlock'
     return classType
 
+#Begin
 print(datetime.datetime.now())
 
+#Look up all guardians in clan
 groupMembers_url = bungie_url + f'/GroupV2/{groupId}/Members/'
 groupMembers = requests.get(groupMembers_url, headers=HEADERS)
 for member in groupMembers.json()['Response']['results']:
     clanIds.update( {member['destinyUserInfo']['displayName']: member['destinyUserInfo']['membershipId']} )
 
+#Lookup all guardianIds per clan roster
 for name,membershipId in clanIds.items():
-#    print(name,membershipId)
     destinyMembershipId = membershipId
     profile_url = bungie_url + '/Destiny2/' + membershipType + '/Profile/' + membershipId + '/?components=Characters'
-    try:
+    try: #If error occurs, look up next set of guardians
         profile = requests.get(profile_url, headers=HEADERS)
+        #Error 1601 = Not Found. Ignore accounts with no guardians (how is that possible?)
         if profile.json()['ErrorCode'] != 1601:
             cid = []
             for c_data in profile.json()['Response']['characters']['data']:
                 cid.append(profile.json()['Response']['characters']['data'][c_data]['characterId'])
             print(f'Motes Lost for {name}')
-#        print(cid)
-#        pp.pprint(profile.json())
+            #Gather carnage reports for each guardian class
             for characterId in cid:
-           # print(characterId +  str(profile.json()['Response']['characters']['data'][characterId]['classType']))
                 classId = className(profile.json()['Response']['characters']['data'][characterId]['classType'])
                 activity_url = bungie_url + f'/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/?mode=63&count=100'
-                try:
+                try: #If error occurs, move on to next class 
                     activity = requests.get(activity_url, headers=HEADERS)
                 except:
-                    print('Error ?')
+                    print('Activity lookup Error')
                     continue
+                #Check and see if gambit data exists, otherwise tell no gambit data found
                 if activity.json()['Response']:
                     motesLost = 0
                     for instance in activity.json()['Response']['activities']:
                         activityId = instance['activityDetails']['instanceId']
                         carnage_url = bungie_url + f'/Destiny2/Stats/PostGameCarnageReport/{activityId}/'
-                        try:
+                        try: #If error occurs, move on to next match for carnage report
                             carnage = requests.get(carnage_url, headers=HEADERS)
                             for char in carnage.json()['Response']['entries']:
                                 if char['characterId'] == characterId:
                                     motesLost = motesLost + int(char['extended']['values']['motesLost']['basic']['displayValue'])
-                                    #print(motesLost)
                         except:
                             print('Get Carnage Error')
                             continue
-
                 else:
                     motesLost = 'No Gambit data found'
                 print(f'\t{classId} : {motesLost}')
