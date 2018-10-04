@@ -12,7 +12,9 @@ from gambitapp.models import GuardianId
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
-HEADERS = 
+#Read in API key from separate file. Keep it secret.
+from bungie_apikey import APIKEY
+HEADERS = APIKEY
 
 groupType='1' #1 = Clan according to the API Doc
 groupName='BreakfastClubGaming'
