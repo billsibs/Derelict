@@ -36,18 +36,34 @@ def getGuardianId(name):
     return gid[0]['guardianId']
 
 def getGuardianClasses(gid):
-    classes = {}
-    temp_classes = GuardianClass.objects.filter(guardianId=gid).values('guardianClass','guardianClassId')
+    classes = []
+    temp_classes = GuardianClass.objects.filter(guardianId=gid).values('guardianClassId')
     for c in temp_classes:
-        classes.update({c['guardianClass']: c['guardianClassId']})
+        classes.append(c['guardianClassId'])
     return classes
+
 def getClanList():
     guardian_list = []
     for g in GuardianId.objects.filter(active=1).values('guardianId'):
         guardian_list.append(g['guardianId'])
     return guardian_list
 
-def className(classId):
+def getGuardianNameByClass(cid):
+    gid = []
+    temp_gid = GuardianClass.objects.filter(guardianClassId=cid).values('guardianId')
+    for g in temp_gid:
+        gid.append(g['guardianId'])
+    name = getGuardianName(gid[0])
+    return name
+
+def getGuardianClassByClassId(cid):
+    temp = []
+    temp_cid = GuardianClass.objects.filter(guardianClassId=cid).values('guardianClass')
+    for c in temp_cid:
+        temp.append(c['guardianClass'])
+    return classType(temp[0])
+
+def classType(classId):
     if classId == 0:
         classType = 'Titan'
     elif classId == 1:
@@ -59,14 +75,16 @@ def className(classId):
 #print(getGuardianId(sys.argv[1]))
 
 for guardian in getClanList():
-    name = getGuardianName(guardian)
+#    name = getGuardianName(guardian)
     classes = getGuardianClasses(guardian)
+#    print(f'{name} {classes}')
 #    print(classes)
-    for c,cid in classes.items():
+    for cid in classes:
+        name = getGuardianNameByClass(int(cid))
         matchCount = gambitStats.objects.filter(guardianId=cid).aggregate(Max('motesLost'))
 #        print(matchCount['motesLost__max'])
         if matchCount['motesLost__max'] != None:
-            print(f'{name}\t{className(c)}:\t{matchCount}')
+            print(f'{name}\t{getGuardianClassByClassId(cid)}:\t{matchCount}')
 
 #matchCount = gambitStats.objects.all().values('guardianId')
 #print(matchCount)
