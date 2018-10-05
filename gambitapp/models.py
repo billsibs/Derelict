@@ -19,10 +19,10 @@ class gambitStats(models.Model):
     motesDegraded = models.IntegerField()
     motesDenied = models.IntegerField()
     motesDeposited = models.IntegerField()
-    motesGenerated = models.IntegerField()
+    motesGenerated = models.IntegerField(default=0)
     motesLost = models.IntegerField()
     motesPickedUp = models.IntegerField()
-    motesStolen = models.IntegerField()
+    motesStolen = models.IntegerField(default=0)
     precisionKills = models.IntegerField()
     primevalDamage = models.IntegerField()
     primevalHealing = models.IntegerField()
@@ -36,3 +36,9 @@ class gambitStats(models.Model):
 class GuardianId(models.Model):
     guardianName = models.CharField(max_length=50)
     guardianId = models.IntegerField()
+    active = models.BooleanField(default=False)
+
+class GuardianClass(models.Model):
+    guardianId = models.IntegerField()
+    guardianClass = models.IntegerField()
+    guardianClassId = models.IntegerField()
