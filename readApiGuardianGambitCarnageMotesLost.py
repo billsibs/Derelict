@@ -9,8 +9,8 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
 #Read in API key from separate file. Keep it secret.
-from bungie_apikey import APIKEY
-HEADERS = APIKEY
+from apikeys import bungie
+HEADERS = bungie.APIKEY
 
 #Class to translate Guardian Class Id to text
 def className(classId):
@@ -33,7 +33,7 @@ clanIds = {}
 print(datetime.datetime.now())
 
 #Look Up accountId based on XBL Name
-search_url= bungie_url + '/Destiny2/SearchDestinyPlayer/' + membershipType + '/' + displayName + '/'
+search_url= bungie_url + f'/Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/'
 res = requests.get(search_url, headers=HEADERS)
 membershipId = res.json()['Response'][0]['membershipId']
 #Dual variables used for membershipId. Create duplicate variables
@@ -48,7 +48,7 @@ for c_data in profile.json()['Response']['characters']['data']:
 #For each guardianId, look up their last 100 post carnage matches
 for characterId in cid:
     classId = className(profile.json()['Response']['characters']['data'][characterId]['classType'])
-    activity_url = bungie_url + f'/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/?mode=63&count=100'
+    activity_url = bungie_url + f'/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/?mode=63&count=10'
     activity = requests.get(activity_url, headers=HEADERS)
 #If there is a response in activity, look up stats, otherwise do nothing and return 0
     if activity.json()['Response']:

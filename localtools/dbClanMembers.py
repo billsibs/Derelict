@@ -8,8 +8,6 @@ django.setup()
 from django.db import models
 from gambitapp.models import GuardianId
 
-from APIKEY import APIKEY
-HEADERS = APIKEY
 
 import pprint
 pp = pprint.PrettyPrinter(indent=2)

@@ -4,7 +4,6 @@ from django.contrib import admin
 
 from gambitapp.models import *
 
-admin.site.register(gStats)
-admin.site.register(gValues)
 admin.site.register(gambitStats)
 admin.site.register(GuardianId)
+admin.site.reguster(GuardianClass)

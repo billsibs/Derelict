@@ -8,8 +8,8 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
 #Read in API key from separate file. Keep it secret.
-from bungie_apikey import APIKEY
-HEADERS = APIKEY
+from apikeys import bungie
+HEADERS = bungie.APIKEY
 
 groupType='1'
 groupName='BreakfastClubGaming'
@@ -52,7 +52,7 @@ for name,membershipId in clanIds.items():
             #Gather carnage reports for each guardian class
             for characterId in cid:
                 classId = className(profile.json()['Response']['characters']['data'][characterId]['classType'])
-                activity_url = bungie_url + f'/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/?mode=63&count=100'
+                activity_url = bungie_url + f'/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/?mode=63&count=10'
                 try: #If error occurs, move on to next class 
                     activity = requests.get(activity_url, headers=HEADERS)
                 except:
