@@ -1,1 +1,6 @@
 __pycache__/
+bungotools.py
+manage.py
+gambit
+gambitapp
+db.sqlite3
